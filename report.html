@@ -1,0 +1,457 @@
+  <!DOCTYPE html>
+<html lang="en"><head>
+<script src="theme.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Report Item</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#7C3AED", 
+            "background-light": "#f7f6f8",
+            "background-dark": "#000000",
+            "foreground-light": "#111827",
+            "foreground-dark": "#FFFFFF",
+            "input-light": "#FFFFFF",
+            "input-dark": "#1F2937",
+            "input-border-light": "#D1D5DB",
+            "input-border-dark": "#4B5563",
+            "placeholder-light": "#6B7280",
+            "placeholder-dark": "#9CA3AF"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.75rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+          boxShadow: {
+            'glow-purple': '0 0 20px 5px rgba(124, 58, 237, 0.5)',
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .form-input {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    .ripple {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transform: scale(10, 10);
+      opacity: 0;
+      transition: transform .5s, opacity 1s;
+    }
+    .ripple:active::after {
+      transform: scale(0, 0);
+      opacity: .2;
+      transition: 0s;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-foreground-light dark:text-foreground-dark">
+<div class="min-h-screen">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+  <!-- Logo on LEFT -->
+  <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition flex-shrink-0">
+    <span class="material-symbols-outlined text-purple-500 text-3xl">inventory_2</span>
+    <h1 class="text-xl font-bold text-purple-500">Lost & Found</h1>
+  </a>
+  
+  <!-- Spacer -->
+  <div class="flex-grow"></div>
+  
+  <!-- Right side actions -->
+  <div class="flex items-center space-x-3 flex-shrink-0">
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Toggle Theme">
+      <span class="material-symbols-outlined text-gray-600 dark:text-gray-400" id="themeIcon">dark_mode</span>
+    </button>
+    <!-- Report button (current page - highlighted) -->
+    <a href="report.html" class="flex items-center justify-center w-10 h-10 bg-purple-500 text-white rounded-full shadow-lg" title="Report Item">
+      <span class="material-symbols-outlined">add</span>
+    </a>
+    <!-- Admin Panel button (only for admins) -->
+    <a href="admin.html" id="adminBtn" class="hidden flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:shadow-lg transition shadow-md" title="Admin Dashboard">
+      <span class="material-symbols-outlined">admin_panel_settings</span>
+    </a>
+    <!-- Profile menu -->
+    <div class="relative" id="profileMenu">
+      <button id="profileBtn" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Profile Menu">
+        <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">person</span>
+      </button>
+      <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20 hidden">
+        <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Profile</a>
+        <a href="myposts.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">My Posts</a>
+        <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+</header>
+<main class="p-4 space-y-6">
+<div class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-md text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 mt-8">
+<form class="space-y-6" id="reportForm">
+<div>
+<label class="sr-only" for="title">Title</label>
+<input class="form-input w-full bg-input-light dark:bg-input-dark border border-input-border-light dark:border-input-border-dark placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-glow-purple transition-shadow duration-300" id="title" name="title" placeholder="Title" type="text" required/>
+</div>
+<div>
+<label class="sr-only" for="description">Description</label>
+<textarea class="form-input w-full bg-input-light dark:bg-input-dark border border-input-border-light dark:border-input-border-dark placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-glow-purple transition-shadow duration-300" id="description" name="description" placeholder="Description" rows="4" required></textarea>
+</div>
+<div>
+<label class="sr-only" for="category">Category</label>
+<select class="form-input w-full bg-input-light dark:bg-input-dark border border-input-border-light dark:border-input-border-dark text-foreground-light dark:text-foreground-dark rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-glow-purple transition-shadow duration-300" id="category" name="category" required>
+<option disabled="" selected="">Category</option>
+<option>Electronics</option>
+<option>Books</option>
+<option>Clothing</option>
+<option>Other</option>
+</select>
+</div>
+<div>
+<label class="sr-only" for="location">Location</label>
+<select class="form-input w-full bg-input-light dark:bg-input-dark border border-input-border-light dark:border-input-border-dark text-foreground-light dark:text-foreground-dark rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-glow-purple transition-shadow duration-300" id="location" name="location" required>
+<option disabled="" selected="">Location</option>
+<option>Library</option>
+<option>Canteen</option>
+<option>Classroom</option>
+<option>Other</option>
+</select>
+</div>
+<div>
+<label class="sr-only" for="contact">Contact</label>
+<input class="form-input w-full bg-input-light dark:bg-input-dark border border-input-border-light dark:border-input-border-dark placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-transparent focus:shadow-glow-purple transition-shadow duration-300" id="contact" name="contact" placeholder="Contact Information" type="text" required/>
+</div>
+<div>
+<label class="block mb-3 text-sm font-medium text-gray-300">Type</label>
+<div class="flex gap-6">
+<label class="flex items-center cursor-pointer group">
+<input type="radio" name="type" value="Lost" checked class="mr-2 w-5 h-5 text-primary focus:ring-primary focus:ring-2 bg-input-dark border-input-border-dark">
+<span class="text-foreground-light dark:text-foreground-dark group-hover:text-primary transition">Lost</span>
+</label>
+<label class="flex items-center cursor-pointer group">
+<input type="radio" name="type" value="Found" class="mr-2 w-5 h-5 text-primary focus:ring-primary focus:ring-2 bg-input-dark border-input-border-dark">
+<span class="text-foreground-light dark:text-foreground-dark group-hover:text-primary transition">Found</span>
+</label>
+</div>
+</div>
+<div id="image-upload-container">
+<label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-input-border-dark rounded-lg cursor-pointer bg-input-light dark:bg-input-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" for="image-upload">
+<div class="flex flex-col items-center justify-center pt-5 pb-6">
+<span class="material-symbols-outlined text-4xl text-gray-400">
+                      cloud_upload
+                  </span>
+<p class="mb-2 text-sm text-placeholder-light dark:text-placeholder-dark"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+<p class="text-xs text-placeholder-light dark:text-placeholder-dark">SVG, PNG, JPG or GIF</p>
+</div>
+<input accept="image/*" class="hidden" id="image-upload" name="image" type="file"/>
+</label>
+<div class="mt-4 hidden" id="thumbnail-preview">
+<div class="flex flex-col items-center gap-3 p-4 bg-gray-800/50 rounded-lg border border-purple-500/30">
+<div class="relative inline-block">
+<img alt="Image preview" class="max-h-48 rounded-lg shadow-lg" id="thumbnail" src=""/>
+<button type="button" id="remove-image-btn" class="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-red-500/50" title="Remove image">
+<span class="material-symbols-outlined text-base">close</span>
+</button>
+</div>
+<p class="text-center text-sm text-green-400 font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-base">check_circle</span>
+Image selected successfully
+</p>
+</div>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-purple-500 to-primary text-white font-bold py-4 px-4 rounded-lg hover:shadow-glow-purple transition-shadow duration-300 ripple" type="submit">
+          Submit Report
+        </button>
+</form>
+</div>
+</main>
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-300 mt-12 border-t-2 border-purple-500">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- College Info -->
+      <div>
+        <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+          <span class="material-symbols-outlined">school</span>
+          SPIT Lost & Found
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          Connecting students with lost & found items around campus.
+        </p>
+      </div>
+      
+      <!-- Contact -->
+      <div>
+        <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+          <span class="material-symbols-outlined">contact_mail</span>
+          Contact
+        </h3>
+        <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+          <li class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-xs mt-0.5">mail</span>
+            <a href="mailto:info@spit.ac.in" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300">info@spit.ac.in</a>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-xs mt-0.5">location_on</span>
+            <span>Andheri (W), Mumbai - 400058</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Quick Links -->
+      <div>
+        <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+          <span class="material-symbols-outlined">link</span>
+          Quick Links
+        </h3>
+        <ul class="text-sm text-gray-700 dark:text-gray-400 space-y-2">
+          <li><a href="index.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Browse Items</a></li>
+          <li><a href="report.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Report Item</a></li>
+          <li><a href="myposts.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> My Posts</a></li>
+          <li><a href="profile.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Profile</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-300 dark:border-gray-800 mt-8 pt-6 text-center">
+      <p class="text-sm text-gray-600 dark:text-gray-500">© 2025 Sardar Patel Institute of Technology. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+<script src="auth.js"></script>
+<script>
+    // Handle report form submission
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+        if (!currentUser) {
+            alert('Please login first');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const category = document.getElementById('category').value;
+        const location = document.getElementById('location').value;
+        const contact = document.getElementById('contact').value;
+        const type = document.querySelector('input[name="type"]:checked').value;
+
+        // Handle image upload if present
+        const imageFile = document.getElementById('image-upload').files[0];
+        
+        // Function to submit the report
+        async function submitReport(imageDataUrl = null) {
+            try {
+                const response = await fetch('/api/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        title: title,
+                        description: description,
+                        category: category,
+                        location_text: location,
+                        type: type,
+                        contact_info: contact,
+                        image_url: imageDataUrl,
+                        found_date: new Date().toISOString().split('T')[0]
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Report submitted successfully!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Failed to submit report: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('Error submitting report. Please try again without image or with a smaller image.');
+            }
+        }
+        
+        if (imageFile) {
+            // Validate file size (max 2MB for better performance)
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            if (imageFile.size > maxSize) {
+                alert('Image is too large! Please select an image smaller than 2MB.');
+                return;
+            }
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(imageFile.type)) {
+                alert('Invalid image type! Please select a JPEG, PNG, GIF, or WebP image.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                await submitReport(e.target.result);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading image file. Please try again or submit without image.');
+                submitReport(null);
+            };
+            
+            reader.readAsDataURL(imageFile);
+        } else {
+            // No image, submit immediately
+            await submitReport(null);
+        }
+    });
+</script>
+</div>
+<script>
+    const imageUpload = document.getElementById('image-upload');
+    const imageUploadContainer = document.getElementById('image-upload-container');
+    const thumbnailPreview = document.getElementById('thumbnail-preview');
+    const thumbnail = document.getElementById('thumbnail');
+    const removeImageBtn = document.getElementById('remove-image-btn');
+    
+    const handleFiles = (files) => {
+      if (files.length) {
+        thumbnail.src = URL.createObjectURL(files[0]);
+        thumbnailPreview.classList.remove('hidden');
+        imageUploadContainer.querySelector('label').classList.add('hidden');
+      }
+    }
+    
+    // Remove image button handler
+    removeImageBtn.addEventListener('click', () => {
+      // Clear the file input
+      imageUpload.value = '';
+      
+      // Hide preview and show upload area
+      thumbnailPreview.classList.add('hidden');
+      imageUploadContainer.querySelector('label').classList.remove('hidden');
+      
+      // Clear the thumbnail source
+      thumbnail.src = '';
+    });
+    imageUpload.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      imageUploadContainer.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+        imageUploadContainer.addEventListener(eventName, () => {
+            imageUploadContainer.querySelector('label').classList.add('bg-primary/20');
+        }, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        imageUploadContainer.addEventListener(eventName, () => {
+            imageUploadContainer.querySelector('label').classList.remove('bg-primary/20');
+        }, false);
+    });
+    imageUploadContainer.addEventListener('drop', (e) => {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        handleFiles(files);
+    }, false);
+    
+    // Show admin button if user is admin
+    const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+    if (currentUser && currentUser.role === 'admin') {
+        const adminBtn = document.getElementById('adminBtn');
+        if (adminBtn) {
+            adminBtn.classList.remove('hidden');
+            adminBtn.classList.add('flex');
+        }
+    }
+    
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            profileDropdown.classList.add('hidden');
+        });
+    }
+    
+    // Logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('campus_lost_found_current_user');
+            localStorage.removeItem('campus_lost_found_login_time');
+            window.location.href = 'home.html';
+        });
+    }
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    if (themeToggle && themeIcon) {
+        // Set initial icon
+        const isDark = document.documentElement.classList.contains('dark');
+        themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('campus_lost_found_theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('campus_lost_found_theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+            }
+        });
+    }
+  </script>
+
+</body></html>

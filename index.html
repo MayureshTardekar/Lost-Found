@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="theme.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Lost & Found</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#7c3aed",
+                    "background-light": "#ffffff",
+                    "background-dark": "#05060a",
+                },
+            },
+        },
+    }
+  </script>
+  <!-- Material Symbols for header icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    /* Consolidated styles for index.html (cards, search, and layout) */
+    :root { 
+      --accent: #7c3aed; 
+      --accent-2: #a855f7; 
+    }
+    html,body { height: 100%; margin: 0; }
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+  .main-wrapper { padding: 0 1rem 3rem; max-width: 1200px; margin: 0 auto; min-height: 80vh; }
+
+    /* Search bar - responsive dark/light mode */
+      .search-bar { display: flex; justify-content: center; margin-bottom: 2rem; padding: 0 1rem; }
+      .search-bar input { width: 60%; max-width: 600px; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 2px solid var(--accent); background: #f3f4f6; color: #1f2937; outline: none; transition: 0.2s; }
+      .dark .search-bar input { background: #0b0f17; color: #fff; }
+      .search-bar input:focus { border-color: var(--accent-2); box-shadow: 0 0 10px #7c3aed60; }
+
+  /* Cards grid */
+  /* Responsive grid: behave like earlier design with 320px min column */
+  .card-container { display: grid; grid-template-columns: repeat(auto-fit, 320px); gap: 1.5rem; padding: 0 1rem; max-width: 1200px; margin: 0 auto; align-content: start; justify-content: center; }
+
+  /* Normalize and restore page-level defaults in case of accidental scaling */
+  body { transform: none !important; zoom: 1 !important; }
+  a { color: var(--accent-2); text-decoration: none; transition: color 0.2s ease; }
+  a:hover { color: var(--accent); text-decoration: none; }
+
+    /* Card with 3D flip - responsive dark/light mode */
+  .card { position: relative; background: linear-gradient(180deg, #f9fafb, #f3f4f6); border-radius: 20px; border: 1px solid rgba(0,0,0,0.08); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; height: auto; min-height: 380px; perspective: 1000px; }
+  .dark .card { background: linear-gradient(180deg, #08101a, #0b1220); border: 1px solid rgba(255,255,255,0.04); }
+  
+  .card-inner { position: relative; width: 100%; height: 100%; min-height: 380px; transition: transform 0.6s; transform-style: preserve-3d; }
+  
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  
+  .card-front, .card-back { position: absolute; width: 100%; height: 100%; min-height: 380px; backface-visibility: hidden; border-radius: 20px; overflow: hidden; }
+  
+  .card-front { background: linear-gradient(180deg, #f9fafb, #f3f4f6); }
+  .dark .card-front { background: linear-gradient(180deg, #08101a, #0b1220); }
+  
+  .card-back { background: linear-gradient(180deg, #e5e7eb, #d1d5db); transform: rotateY(180deg); padding: 20px; overflow-y: auto; }
+  .dark .card-back { background: linear-gradient(180deg, #0f1729, #1a1f35); }
+  
+  .card-image { width: 100%; height: 180px; object-fit: cover; display: block; }
+
+    /* Container-level search scaling to avoid per-card flicker */
+    /* During search, avoid shrinking cards — instead cap their maximum width and center them */
+    .card-container.search-active { grid-template-columns: repeat(auto-fit, minmax(320px, 360px)); justify-content: center; }
+    .card-container.search-active .card { transform: none; }
+
+    .card-top { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+    .lost-found-badge { padding: 4px 8px; border-radius: 8px; font-size: .75rem; font-weight: 700; text-transform: uppercase; height: 1.5rem; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .lost-found-badge.lost { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .lost-found-badge.found { background: linear-gradient(135deg, #22c55e, #16a34a); }
+
+  .card-details { color: #1f2937; padding: 12px; display: grid; align-content: start; gap: 8px; height: calc(100% - 200px); overflow: hidden; }
+  .dark .card-details { color: #d1d5db; }
+  .text-body { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  .text-title { font-size: 1.1rem; font-weight: 600; color: var(--accent-2); }
+  .text-body { color: #6b7280; font-size: .95rem; }
+  .dark .text-body { color: #9ca3af; }
+
+    /* Call-to-action button slides up on hover */
+  /* Use translateY with pixel offsets so the button always remains inside the card area */
+  .card-button { position: absolute; left: 50%; transform: translateX(-50%) translateY(44px); bottom: 12px; padding: .6rem 1.2rem; border-radius: 14px; border: none; background: var(--accent); color: #fff; cursor: pointer; transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease; opacity: 0; box-shadow: 0 6px 18px rgba(124,58,237,0.22); }
+  .card:hover .card-button { transform: translateX(-50%) translateY(0); opacity: 1; box-shadow: 0 8px 28px rgba(124,58,237,0.32); }
+
+  /* subtle lift on hover for card front only */
+  .card:not(.flipped):hover { transform: translateY(-6px) scale(1.02); }
+
+    .no-items-message { display: none; grid-column: 1 / -1; color: #9ca3af; align-self: start; justify-self: center; padding: 2rem 0; text-align: center; font-size: 1.1rem; }
+
+    .status-badge { padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: .75rem; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .status-badge.claimed { background: #fef3c7; color: #b45309; }
+    .status-badge.unclaimed { background: #fee2e2; color: #991b1b; }
+
+    .show { display: block; }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100">
+  <header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+    <div class="flex items-center justify-between px-6 py-4 w-full">
+      <!-- Logo on LEFT -->
+      <a href="#" id="logoLink" class="flex items-center gap-2 hover:opacity-80 transition flex-shrink-0">
+        <span class="material-symbols-outlined text-purple-500 text-3xl">inventory_2</span>
+        <h1 class="text-xl font-bold text-purple-500">Lost & Found</h1>
+      </a>
+      
+      <!-- Spacer to push content to edges -->
+      <div class="flex-grow"></div>
+      
+      <!-- Right side actions - PROPER RIGHT -->
+      <div class="flex items-center space-x-3 flex-shrink-0">
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Toggle Theme">
+          <span class="material-symbols-outlined text-gray-600 dark:text-gray-400" id="themeIcon">dark_mode</span>
+        </button>
+        <!-- Add button -->
+        <a href="report.html" class="flex items-center justify-center w-10 h-10 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition shadow-lg" title="Report Item">
+          <span class="material-symbols-outlined">add</span>
+        </a>
+        <!-- Admin Panel button (only for admins) -->
+        <a href="admin.html" id="adminBtn" class="hidden flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:shadow-lg transition shadow-md" title="Admin Dashboard">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+        </a>
+        <!-- Profile menu -->
+        <div class="relative" id="profileMenu">
+          <button id="profileBtn" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Profile Menu">
+            <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">person</span>
+          </button>
+          <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20 hidden">
+            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Profile</a>
+            <a href="myposts.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">My Posts</a>
+            <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="main-wrapper">
+    <h2 class="text-3xl font-bold text-center text-purple-400 py-8">
+      Browse Lost & Found Items
+    </h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search for items (e.g. wallet, ID card, bag)..."
+      />
+    </div>
+
+    <!-- Cards -->
+    <div class="card-container" id="cardContainer">
+      <div class="no-items-message" id="noItemsMessage" style="display: none;">No items found</div>
+      <!-- Dynamic cards will be loaded here -->
+    </div>
+  </main>
+  <footer class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-300 mt-12 border-t-2 border-purple-500">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- College Info -->
+        <div>
+          <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">school</span>
+            SPIT Lost & Found
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            Connecting students with lost & found items around campus.
+            Making it easier to reunite belongings with their owners.
+          </p>
+        </div>
+        
+        <!-- Contact -->
+        <div>
+          <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">contact_mail</span>
+            Contact
+          </h3>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-xs mt-0.5">mail</span>
+              <a href="mailto:info@spit.ac.in" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition">info@spit.ac.in</a>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-xs mt-0.5">language</span>
+              <a href="http://www.spit.ac.in" target="_blank" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition">www.spit.ac.in</a>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-xs mt-0.5">location_on</span>
+              <span>Bhavan's Campus, Munshi Nagar, Andheri (W), Mumbai - 400058</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-purple-600 dark:text-purple-400 font-bold text-lg mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">link</span>
+            Quick Links
+          </h3>
+          <ul class="text-sm text-gray-700 dark:text-gray-400 space-y-2">
+            <li><a href="index.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Browse Items</a></li>
+            <li><a href="report.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Report Item</a></li>
+            <li><a href="myposts.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> My Posts</a></li>
+            <li><a href="profile.html" class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1"><span class="material-symbols-outlined text-xs">chevron_right</span> Profile</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Copyright -->
+      <div class="border-t border-gray-300 dark:border-gray-800 mt-8 pt-6 text-center">
+        <p class="text-sm text-gray-600 dark:text-gray-500">
+          © 2025 Sardar Patel Institute of Technology. All rights reserved.
+        </p>
+        <div class="flex justify-center gap-4 mt-3">
+          <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition" title="Instagram">
+            <span class="text-xl">📷</span>
+          </a>
+          <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition" title="Twitter">
+            <span class="text-xl">🐦</span>
+          </a>
+          <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition" title="LinkedIn">
+            <span class="text-xl">💼</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      const searchInput = document.getElementById('searchInput');
+      const cardContainer = document.getElementById('cardContainer');
+      const noItemsMessage = document.getElementById('noItemsMessage');
+      let allCards = [];
+
+      async function loadPosts() {
+        try {
+          // Fetch from MySQL API
+          const response = await fetch('/api/items');
+          const posts = await response.json();
+          
+        cardContainer.innerHTML = '<div class="no-items-message" id="noItemsMessage" style="display: none;">No items found</div>';
+
+        if (posts.length === 0) {
+          noItemsMessage.style.display = 'block';
+          return;
+        }
+
+        posts.forEach(post => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.dataset.postId = post.id;
+          const imageUrl = post.image_url || post.image || 'https://via.placeholder.com/400x200/1a1a2e/a855f7?text=No+Image+Available';
+          const hasNoImage = !post.image_url && !post.image;
+          const locationText = post.location_text || post.location_name || 'N/A';
+          const dateText = post.found_date ? new Date(post.found_date).toLocaleDateString() : (post.created_at ? new Date(post.created_at).toLocaleDateString() : 'N/A');
+          
+          card.innerHTML = `
+            <div class="card-inner">
+              <!-- Front of card -->
+              <div class="card-front">
+                <div style="position: relative;">
+                  <img src="${imageUrl}" 
+                       alt="${post.title}" 
+                       class="card-image"
+                       onerror="this.src='https://via.placeholder.com/400x200/1a1a2e/a855f7?text=No+Image+Available'">
+                  ${hasNoImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(124, 58, 237, 0.9); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; color: white;">No Image</div>' : ''}
+                </div>
+            <div class="card-top">
+              <div class="lost-found-badge ${post.type.toLowerCase()}">${post.type}</div>
+              <div class="status-badge ${post.status === 'Resolved' ? 'claimed' : 'unclaimed'}">${post.status === 'Resolved' ? 'Claimed' : 'Unclaimed'}</div>
+            </div>
+            <div class="card-details">
+              <p class="text-title">${post.title}</p>
+                  <p class="text-body">${post.description || 'No description'}</p>
+                </div>
+                <button class="card-button" onclick="flipCard(${post.id})">More Info</button>
+              </div>
+              
+              <!-- Back of card -->
+              <div class="card-back">
+                <div style="color: #a855f7; font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;">${post.title}</div>
+                <div style="color: #d1d5db; margin-bottom: 12px; line-height: 1.6;">${post.description || 'No description provided'}</div>
+                <div style="border-top: 1px solid rgba(168, 85, 247, 0.2); margin: 16px 0; padding-top: 16px;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #9ca3af;">
+                    <span style="color: #a855f7;">📍</span> <strong>Location:</strong> ${locationText}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #9ca3af;">
+                    <span style="color: #a855f7;">📅</span> <strong>Date:</strong> ${dateText}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #9ca3af;">
+                    <span style="color: #a855f7;">📧</span> <strong>Contact:</strong> ${post.contact_info}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #9ca3af;">
+                    <span style="color: #a855f7;">🏷️</span> <strong>Category:</strong> ${post.category}
+                  </div>
+                </div>
+                ${post.type === 'Found' && post.status !== 'Resolved' ? `
+                  <button onclick="openClaimModal(${post.id}, '${post.title.replace(/'/g, "\\'")}', ${post.user_id})" style="width: 100%; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; margin-bottom: 8px; transition: background 0.2s;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+                    ✓ Claim This Item
+                  </button>
+                ` : ''}
+                <button onclick="flipCard(${post.id})" style="width: 100%; padding: 12px; background: #7c3aed; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background='#6b21a8'" onmouseout="this.style.background='#7c3aed'">
+                  ← Back
+                </button>
+              </div>
+            </div>
+          `;
+          cardContainer.appendChild(card);
+        });
+
+        allCards = Array.from(document.querySelectorAll('.card'));
+        noItemsMessage.style.display = 'none';
+        } catch (error) {
+          console.error('Error loading posts:', error);
+          noItemsMessage.textContent = 'Error loading items';
+          noItemsMessage.style.display = 'block';
+        }
+      }
+
+      function showAll() {
+        allCards.forEach(c => c.style.display = 'block');
+        noItemsMessage.style.display = 'none';
+        cardContainer.classList.remove('search-active');
+      }
+
+      function updateSearch() {
+        const raw = (searchInput.value || '').trim().toLowerCase();
+        if (raw === '') { showAll(); return; }
+
+        let visible = 0;
+        allCards.forEach(card => {
+          const title = (card.querySelector('.text-title')?.textContent || '').toLowerCase();
+          const body = (card.querySelector('.text-body')?.textContent || '').toLowerCase();
+          const match = title.includes(raw) || body.includes(raw);
+          card.style.display = match ? 'block' : 'none';
+          if (match) visible++;
+        });
+
+        noItemsMessage.style.display = visible === 0 ? 'block' : 'none';
+        cardContainer.classList.add('search-active');
+      }
+
+      searchInput.addEventListener('input', updateSearch);
+
+      // On blur (click outside or Esc), reset the search and show all cards
+      searchInput.addEventListener('blur', () => { setTimeout(() => { searchInput.value=''; showAll(); }, 50); });
+
+      document.addEventListener('click', (e) => { if (!searchInput.contains(e.target)) searchInput.blur(); });
+      searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') searchInput.blur(); });
+
+      // Load posts on page load
+      loadPosts();
+    })();
+
+    function flipCard(postId) {
+      const card = document.querySelector(`.card[data-post-id="${postId}"]`);
+      if (card) {
+        card.classList.toggle('flipped');
+      }
+    }
+  </script>
+
+  <script src="auth.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Smart logo navigation - Logged in: stay on index.html, Logged out: go to home.html
+    document.addEventListener('DOMContentLoaded', () => {
+      const logoLink = document.getElementById('logoLink');
+      const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+      
+      // Show admin button if user is admin
+      if (currentUser && currentUser.role === 'admin') {
+        const adminBtn = document.getElementById('adminBtn');
+        if (adminBtn) {
+          adminBtn.classList.remove('hidden');
+          adminBtn.classList.add('flex');
+        }
+      }
+      
+      if (logoLink) {
+        logoLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          if (currentUser) {
+            // Logged in → Stay on index.html (or refresh)
+            window.location.href = 'index.html';
+          } else {
+            // Logged out → Go to home.html (landing page)
+            window.location.href = 'home.html';
+          }
+        });
+      }
+      
+      // Theme toggle
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (themeToggle && themeIcon) {
+        // Set initial icon
+        const isDark = document.documentElement.classList.contains('dark');
+        themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        
+        themeToggle.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          
+          if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('campus_lost_found_theme', 'light');
+            themeIcon.textContent = 'dark_mode';
+          } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('campus_lost_found_theme', 'dark');
+            themeIcon.textContent = 'light_mode';
+          }
+        });
+      }
+      
+      // Profile dropdown toggle
+      const profileBtn = document.getElementById('profileBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          profileDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          profileDropdown.classList.add('hidden');
+        });
+
+        // Logout functionality
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('campus_lost_found_current_user');
+            window.location.href = 'home.html';
+          });
+        }
+      }
+    });
+
+    // Claim Modal Functions
+    let currentClaimItemId = null;
+    let currentClaimOwnerId = null;
+
+    function openClaimModal(itemId, itemTitle, ownerId) {
+      const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+      
+      if (!currentUser) {
+        alert('Please login to claim items');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (currentUser.id === ownerId) {
+        alert('You cannot claim your own item!');
+        return;
+      }
+
+      currentClaimItemId = itemId;
+      currentClaimOwnerId = ownerId;
+      document.getElementById('claimItemTitle').textContent = itemTitle;
+      document.getElementById('claimModal').classList.remove('hidden');
+    }
+
+    function closeClaimModal() {
+      document.getElementById('claimModal').classList.add('hidden');
+      document.getElementById('claimForm').reset();
+      currentClaimItemId = null;
+      currentClaimOwnerId = null;
+    }
+
+    // Handle claim form submission
+    document.getElementById('claimForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+      if (!currentUser) return;
+
+      const contact = document.getElementById('claimContact').value;
+      const message = document.getElementById('claimMessage').value;
+      const proofFile = document.getElementById('claimProof').files[0];
+
+      // Process proof image if provided
+      let proofImage = null;
+      if (proofFile) {
+        if (proofFile.size > 2 * 1024 * 1024) {
+          alert('Proof image is too large! Max 2MB.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          proofImage = e.target.result;
+          await submitClaim(currentUser.id, currentClaimItemId, currentClaimOwnerId, contact, message, proofImage);
+        };
+        reader.readAsDataURL(proofFile);
+      } else {
+        await submitClaim(currentUser.id, currentClaimItemId, currentClaimOwnerId, contact, message, null);
+      }
+    });
+
+    async function submitClaim(claimantId, itemId, ownerId, contact, message, proof) {
+      try {
+        // Combine contact and message
+        const fullMessage = `Contact: ${contact}\n\n${message || 'No additional message.'}`;
+        
+        const response = await fetch('/api/claims', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_id: itemId,
+            claimant_user_id: claimantId,
+            message: fullMessage,
+            proof_image: proof
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Claim submitted successfully! The item owner will be notified.');
+          closeClaimModal();
+          location.reload();
+        } else {
+          alert('Failed to submit claim: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error submitting claim:', error);
+        alert('Error submitting claim. Please try again.');
+      }
+    }
+  </script>
+
+  <!-- Claim Modal -->
+  <div id="claimModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-gray-900 rounded-2xl border border-purple-500/30 max-w-md w-full p-6 shadow-2xl">
+      <h3 class="text-2xl font-bold text-purple-400 mb-4">Claim This Item</h3>
+      <p class="text-gray-300 mb-4">You're claiming: <span class="font-semibold text-white" id="claimItemTitle"></span></p>
+      
+      <form id="claimForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Your Contact Info</label>
+          <input type="text" id="claimContact" required class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none" placeholder="Phone or Email">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Message (Optional)</label>
+          <textarea id="claimMessage" rows="3" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none" placeholder="Describe your lost item or provide additional details..."></textarea>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Proof Photo (Optional)</label>
+          <input type="file" id="claimProof" accept="image/*" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-purple-600 file:text-white file:cursor-pointer">
+          <p class="text-xs text-gray-500 mt-1">Max 2MB</p>
+        </div>
+        
+        <div class="flex gap-3 mt-6">
+          <button type="button" onclick="closeClaimModal()" class="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">Cancel</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">Submit Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

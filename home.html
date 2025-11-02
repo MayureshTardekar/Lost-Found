@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="theme.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Campus Lost &amp; Found</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7311d4",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#191022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glowing-text {
+            text-shadow: 0 0 8px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.3);
+        }
+        .glowing-icon {
+            filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.5));
+        }
+        .purple-gradient {
+            background-image: linear-gradient(to right, #7C3AED, #6B46C1);
+        }
+        .glowing-badge::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background-color: #7C3AED;
+            box-shadow: 0 0 6px #7C3AED;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(124,58,237,0.1)"/><circle cx="20" cy="20" r="20" fill="rgba(124,58,237,0.05)"/><circle cx="80" cy="80" r="30" fill="rgba(124,58,237,0.08)"/></svg>');
+            background-size: cover;
+        }
+        .pulse-text {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+    <style>
+      /* Layout normalization to recover from accidental scaling/unstyled anchors */
+      :root { --primary: #7311d4; }
+      html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+      body { transform: none !important; zoom: 1 !important; min-height: 100vh; }
+      img { max-width: 100%; height: auto; display: block; }
+      a { color: inherit; text-decoration: none; }
+      a:hover { color: var(--primary); }
+      /* Ensure the container width and header layout are stable */
+      nav.container { max-width: 1200px; }
+      /* Hero cards grid sizing (3 columns at md and above) */
+      .hero-grid-3 { grid-template-columns: repeat(1, minmax(0,1fr)); }
+      @media (min-width: 768px) { .hero-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+      /* Footer link hover */
+      footer a:hover { color: #ffffff; }
+      /* Safe defaults for interactive elements */
+      .glowing-text { text-shadow: 0 0 8px rgba(124,58,237,0.25); }
+    </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100">
+<header class="bg-background-light dark:bg-black/50 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+  <!-- Logo on LEFT -->
+  <a href="home.html" class="flex items-center gap-2 hover:opacity-80 transition flex-shrink-0">
+    <span class="text-3xl">📦</span>
+    <h1 class="text-xl font-bold text-purple-500 glowing-text">Lost &amp; Found</h1>
+  </a>
+  
+  <!-- Spacer to push content to edges -->
+  <div class="flex-grow"></div>
+  
+  <!-- Login/Sign Up on PROPER RIGHT -->
+  <div class="flex items-center space-x-3 flex-shrink-0">
+    <a href="login.html" class="px-4 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 bg-background-light/50 dark:bg-background-dark/50 border border-gray-300 dark:border-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-300">Login</a>
+    <a href="register.html" class="px-4 py-2 text-sm font-medium text-white purple-gradient rounded-full hover:shadow-lg hover:shadow-primary/50 transition-shadow duration-300">Sign Up</a>
+  </div>
+</div>
+</header>
+<main class="min-h-screen flex flex-col">
+  <!-- Hero Section -->
+  <section class="hero-bg flex-1 flex items-center justify-center px-4 py-16">
+    <div class="text-center space-y-8 max-w-4xl mx-auto">
+      <div class="space-y-4">
+        <h1 class="text-5xl md:text-7xl font-bold text-white glowing-text">
+          Lost Something?
+        </h1>
+        <h2 class="text-3xl md:text-5xl font-bold text-primary pulse-text">
+          Found Something?
+        </h2>
+        <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+          Connect with your campus community to recover lost items and help others find theirs.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="login.html" class="bg-gradient-to-r from-purple-600 to-primary text-white font-bold py-4 px-8 rounded-lg text-center hover:shadow-glow-purple transition-all duration-300 transform hover:scale-105 shadow-lg">
+          I'm Looking for Something
+        </a>
+        <a href="register.html" class="border-2 border-primary text-primary font-bold py-4 px-8 rounded-lg text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-glow-purple">
+          I Found Something
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center">
+          <div class="text-4xl mb-4">🔒</div>
+          <h3 class="text-xl font-bold text-white mb-2">Secure & Private</h3>
+          <p class="text-gray-300">Your information stays safe within the campus community.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center">
+          <div class="text-4xl mb-4">⚡</div>
+          <h3 class="text-xl font-bold text-white mb-2">Instant Reporting</h3>
+          <p class="text-gray-300">Report items quickly and get notifications when matches are found.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center">
+          <div class="text-4xl mb-4">🤝</div>
+          <h3 class="text-xl font-bold text-white mb-2">Connect with Others</h3>
+          <p class="text-gray-300">Help fellow students and build a supportive community.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-300 text-center py-8 border-t-2 border-purple-500">
+  <div class="max-w-7xl mx-auto px-4">
+    <p class="text-sm text-gray-600 dark:text-gray-400">
+      © 2025 Sardar Patel Institute of Technology (SPIT), Andheri (W), Mumbai<br>
+      Connecting students with lost & found items around campus.<br>
+      Bhavan's Campus, Munshi Nagar, Andheri (W), Mumbai - 400058<br>
+      Email: <a href="mailto:info@spit.ac.in" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition">info@spit.ac.in</a> | 
+      Website: <a href="http://www.spit.ac.in" target="_blank" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition">www.spit.ac.in</a>
+    </p>
+    <div class="mt-4 flex justify-center gap-4">
+      <a href="#" title="Instagram" class="text-xl text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition">📷</a>
+      <a href="#" title="Twitter" class="text-xl text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition">🐦</a>
+      <a href="#" title="LinkedIn" class="text-xl text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition">💼</a>
+    </div>
+  </div>
+</footer>
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('-translate-x-full');
+            mobileMenu.classList.toggle('translate-x-0');
+        });
+
+        // Auto-redirect if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('campus_lost_found_current_user');
+            if (currentUser) {
+                // Redirect to main app if already logged in
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <script src="theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Lost & Found</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7c3aed",
+                        "background-light": "#ffffff",
+                        "background-dark": "#05060a",
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: 100vh;
+        }
+        
+        .glow-card {
+            transition: all 0.3s ease;
+        }
+        
+        .glow-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(124, 58, 237, 0.08) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        .dark .stat-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+    </style>
+</head>
+<body class="h-full bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+    <div class="flex items-center justify-between px-6 py-4 w-full">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition flex-shrink-0">
+            <span class="material-symbols-outlined text-purple-500 text-3xl">inventory_2</span>
+            <h1 class="text-xl font-bold text-purple-500">Lost & Found</h1>
+        </a>
+        
+        <div class="flex-grow"></div>
+        
+        <!-- Right side actions -->
+        <div class="flex items-center space-x-3 flex-shrink-0">
+            <!-- Theme Toggle -->
+            <button id="themeToggle" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Toggle Theme">
+                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400" id="themeIcon">dark_mode</span>
+            </button>
+            <!-- Add button -->
+            <a href="report.html" class="flex items-center justify-center w-10 h-10 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition shadow-lg" title="Report Item">
+                <span class="material-symbols-outlined">add</span>
+            </a>
+            <!-- Admin Panel button (only for admins) -->
+            <a href="admin.html" id="adminBtn" class="hidden flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:shadow-lg transition shadow-md" title="Admin Dashboard">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+            </a>
+            <!-- Profile menu -->
+            <div class="relative" id="profileMenu">
+                <button id="profileBtn" class="flex items-center justify-center w-10 h-10 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition" title="Profile Menu">
+                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">person</span>
+                </button>
+                <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20 hidden">
+                    <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Profile</a>
+                    <a href="myposts.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">My Posts</a>
+                    <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-5xl mx-auto px-4 py-12">
+    <!-- Profile Header Card -->
+    <div class="glow-card bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-300 dark:border-gray-800 mb-8">
+        <div class="flex items-center gap-6">
+            <!-- Avatar -->
+            <div class="relative group cursor-pointer" onclick="document.getElementById('avatarInput').click()">
+                <div class="w-24 h-24 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-purple-500/50">
+                    <span id="avatar">U</span>
+                </div>
+                <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-symbols-outlined text-white text-2xl">photo_camera</span>
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" class="hidden">
+            </div>
+            
+            <!-- User Info -->
+            <div class="flex-grow">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-1" id="userName">Loading...</h2>
+                <p class="text-gray-400 mb-2" id="userEmail">user@spit.ac.in</p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span>🎓 <span id="userUCID">UCID</span></span>
+                    <span>📅 Member since <span id="memberSince">2025</span></span>
+                </div>
+            </div>
+            
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="px-6 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition border border-red-600/30 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <!-- Total Posts -->
+        <div class="stat-card glow-card p-6 rounded-xl text-center">
+            <div class="text-4xl font-bold text-purple-400 mb-2" id="totalPosts">0</div>
+            <div class="text-sm text-gray-400">Total Posts</div>
+        </div>
+        
+        <!-- Lost Items -->
+        <div class="stat-card glow-card p-6 rounded-xl text-center">
+            <div class="text-4xl font-bold text-red-400 mb-2" id="lostItems">0</div>
+            <div class="text-sm text-gray-400">Lost Items</div>
+        </div>
+        
+        <!-- Found Items -->
+        <div class="stat-card glow-card p-6 rounded-xl text-center">
+            <div class="text-4xl font-bold text-green-400 mb-2" id="foundItems">0</div>
+            <div class="text-sm text-gray-400">Found Items</div>
+        </div>
+        
+        <!-- Open Cases -->
+        <div class="stat-card glow-card p-6 rounded-xl text-center">
+            <div class="text-4xl font-bold text-yellow-400 mb-2" id="openItems">0</div>
+            <div class="text-sm text-gray-400">Open</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- My Posts -->
+        <a href="myposts.html" class="glow-card bg-gradient-to-br from-purple-900/40 to-purple-800/20 p-6 rounded-xl border border-purple-700/30 hover:border-purple-600/50 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-purple-600/30 rounded-full flex items-center justify-center group-hover:bg-purple-600/50 transition">
+                    <span class="material-symbols-outlined text-purple-400 text-2xl">inventory</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">My Posts</h3>
+                    <p class="text-sm text-gray-400">View and manage your items</p>
+                </div>
+            </div>
+        </a>
+        
+        <!-- Report Item -->
+        <a href="report.html" class="glow-card bg-gradient-to-br from-blue-900/40 to-blue-800/20 p-6 rounded-xl border border-blue-700/30 hover:border-blue-600/50 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600/30 rounded-full flex items-center justify-center group-hover:bg-blue-600/50 transition">
+                    <span class="material-symbols-outlined text-blue-400 text-2xl">add_circle</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Report Item</h3>
+                    <p class="text-sm text-gray-400">Report lost or found item</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="glow-card bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-300 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h3>
+            <a href="myposts.html" class="text-purple-400 hover:text-purple-300 text-sm flex items-center gap-1">
+                View All
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+        </div>
+        
+        <div id="activityContainer" class="space-y-3">
+            <!-- Activities will be loaded here -->
+        </div>
+        
+        <div id="noActivity" class="text-center text-gray-500 py-8 hidden">
+            <span class="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
+            <p>No recent activity</p>
+            <a href="report.html" class="text-purple-400 hover:text-purple-300 text-sm mt-2 inline-block">Report your first item</a>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-100 dark:bg-gray-900/50 border-t border-gray-300 dark:border-gray-800 mt-16">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-center">
+        <p class="text-sm text-gray-600 dark:text-gray-500">© 2025 SPIT Lost & Found. All rights reserved.</p>
+        <div class="flex justify-center gap-4 mt-3">
+            <a href="index.html" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm transition">Browse</a>
+            <a href="report.html" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm transition">Report</a>
+            <a href="myposts.html" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm transition">My Posts</a>
+        </div>
+    </div>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check if user is logged in
+    const currentUser = JSON.parse(localStorage.getItem('campus_lost_found_current_user'));
+    
+    if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Populate user info
+    const avatarEl = document.getElementById('avatar');
+    if (currentUser.avatar) {
+        avatarEl.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full object-cover rounded-full">`;
+    } else {
+        avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
+    }
+    
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userEmail').textContent = currentUser.email;
+    document.getElementById('userUCID').textContent = currentUser.ucid || 'N/A';
+    
+    // Format member since date
+    const joinDate = currentUser.joinedDate || currentUser.createdAt;
+    if (joinDate) {
+        const date = new Date(joinDate);
+        document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    // Load user's posts from API
+    try {
+        const response = await fetch(`/api/myposts/${currentUser.id}`);
+        const userPosts = await response.json();
+        
+        // Calculate statistics
+        document.getElementById('totalPosts').textContent = userPosts.length;
+        document.getElementById('lostItems').textContent = userPosts.filter(p => p.type === 'Lost').length;
+        document.getElementById('foundItems').textContent = userPosts.filter(p => p.type === 'Found').length;
+        document.getElementById('openItems').textContent = userPosts.filter(p => p.status === 'Open').length;
+        
+        // Show recent activity (last 5 items)
+        const activityContainer = document.getElementById('activityContainer');
+        const noActivity = document.getElementById('noActivity');
+        
+        if (userPosts.length === 0) {
+            noActivity.classList.remove('hidden');
+        } else {
+            const recentPosts = userPosts.slice(0, 5);
+            recentPosts.forEach(post => {
+                const date = new Date(post.created_at || post.date);
+                const timeAgo = getTimeAgo(date);
+                
+                const activityEl = document.createElement('div');
+                activityEl.className = 'flex items-center gap-4 p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800/70 transition';
+                activityEl.innerHTML = `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${post.type === 'Lost' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'}">
+                        <span class="material-symbols-outlined text-xl">${post.type === 'Lost' ? 'search_off' : 'check_circle'}</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-gray-900 dark:text-white font-medium">${post.title}</p>
+                        <p class="text-sm text-gray-400">${post.type} • ${timeAgo}</p>
+                    </div>
+                    <span class="px-3 py-1 text-xs rounded-full ${post.status === 'Open' ? 'bg-yellow-600/20 text-yellow-400' : 'bg-green-600/20 text-green-400'}">${post.status}</span>
+                `;
+                activityContainer.appendChild(activityEl);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading posts:', error);
+        document.getElementById('noActivity').classList.remove('hidden');
+    }
+
+    // Avatar upload
+    document.getElementById('avatarInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image too large! Please select an image smaller than 2MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentUser.avatar = e.target.result;
+                localStorage.setItem('campus_lost_found_current_user', JSON.stringify(currentUser));
+                
+                // Update display
+                document.getElementById('avatar').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-full">`;
+                
+                // Show notification
+                showNotification('Profile picture updated!');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Show admin button if user is admin
+    if (currentUser && currentUser.role === 'admin') {
+        const adminBtn = document.getElementById('adminBtn');
+        if (adminBtn) {
+            adminBtn.classList.remove('hidden');
+            adminBtn.classList.add('flex');
+        }
+    }
+    
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            profileDropdown.classList.add('hidden');
+        });
+    }
+    
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('campus_lost_found_current_user');
+            localStorage.removeItem('campus_lost_found_login_time');
+            window.location.href = 'home.html';
+        }
+    });
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    // Set initial icon
+    const isDark = document.documentElement.classList.contains('dark');
+    themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('campus_lost_found_theme', 'light');
+            themeIcon.textContent = 'dark_mode';
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('campus_lost_found_theme', 'dark');
+            themeIcon.textContent = 'light_mode';
+        }
+    });
+});
+
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+    };
+    
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+            return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+        }
+    }
+    
+    return 'Just now';
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-fade-in';
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-10px)';
+        notification.style.transition = 'all 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+</script>
+
+</body>
+</html>
